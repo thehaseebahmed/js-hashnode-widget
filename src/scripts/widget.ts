@@ -6,8 +6,12 @@
   }
 
   class ThaHashnodeWidget {
+    private options: ThaHashnodeWidgetOptions = {} as ThaHashnodeWidgetOptions;
+
     public async init(options: ThaHashnodeWidgetOptions) {
-      const selector: string = options.renderTo ?? "#tha-hashnode-widget";
+      this.options = options;
+
+      const selector: string = this.options.renderTo ?? "#tha-hashnode-widget";
       const container = document.querySelector(selector);
       if (container == null) {
         console.error(
@@ -16,7 +20,7 @@
         return;
       }
 
-      const data = (await this.getFeaturedPosts(options.username)).data;
+      const data = (await this.getFeaturedPosts(this.options.username)).data;
       if (data == null) {
         console.error(
           "[THA-HW] I was unable to render the widget because something went wrong getting posts from the Hashnode api."
@@ -26,7 +30,33 @@
 
       const posts = data.user.publication.posts;
       this.injectHtml(container, posts);
-      this.injectStyles(options.renderTo);
+      this.injectStyles(this.options.renderTo);
+    }
+
+    private createUrlForPost(slug: string) {
+      const base = this.options.blogUrl.endsWith("/")
+        ? this.options.blogUrl
+        : `${this.options.blogUrl}/`;
+
+      return `${base}${slug}`;
+    }
+
+    private async getFeaturedPosts(username: string, page: number = 0) {
+      const GET_USER_ARTICLES = `
+          query GetUserArticles($page: Int!) {
+              user(username: \"${username}\") {
+                  publication {
+                      posts(page: $page) {
+                          coverImage
+                          slug
+                          title
+                      }
+                  }
+              }
+          }
+      `;
+
+      return this.gql(GET_USER_ARTICLES, { page });
     }
 
     private async gql(query: any, variables = {}) {
@@ -44,23 +74,6 @@
       return data.json();
     }
 
-    private async getFeaturedPosts(username: string, page: number = 0) {
-      const GET_USER_ARTICLES = `
-          query GetUserArticles($page: Int!) {
-              user(username: \"${username}\") {
-                  publication {
-                      posts(page: $page) {
-                          coverImage
-                          title
-                      }
-                  }
-              }
-          }
-      `;
-
-      return this.gql(GET_USER_ARTICLES, { username, page });
-    }
-
     private injectHtml(element: Element, posts: any) {
       for (const post of posts) {
         const imgContainer = document.createElement("div");
@@ -76,7 +89,11 @@
 
         const title = document.createElement("div");
         title.setAttribute("class", "tha-hashnode-widget__title");
-        title.innerText = post.title;
+        const titleHref = document.createElement("a");
+        titleHref.setAttribute("href", this.createUrlForPost(post.slug));
+        titleHref.setAttribute("target", "_blank");
+        titleHref.innerText = post.title;
+        title.append(titleHref);
 
         const item = document.createElement("div");
         item.setAttribute("class", "tha-hashnode-widget__blog-post");
@@ -115,6 +132,10 @@
         ${selector} .tha-hashnode-widget__blog-post .tha-hashnode-widget__title {
           font-weight: bold;
           padding-top: 0.25rem;
+        }
+        
+        ${selector} .tha-hashnode-widget__blog-post .tha-hashnode-widget__title a {
+          text-decoration: none;
         }
 
         @media (min-width: 640px) {
