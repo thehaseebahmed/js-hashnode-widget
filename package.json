@@ -1,0 +1,37 @@
+{
+  "name": "tha-hashnode-widget",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "npm run copy && npx tsc",
+    "build:prod": "npm run clean && npm run build && npm run uglify",
+    "clean": "npx rimraf ./dist/*",
+    "copy": "copyfiles ./src/* ./dist -f -e ./src/scripts",
+    "dev": "npm run clean && watch \"npm run build\" ./src",
+    "uglify": "uglifyjs -c -m  --webkit -o ./dist/widget.min.js -- ./dist/widget.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thehaseebahmed/js-hashnode-widget.git"
+  },
+  "keywords": [
+    "hashnode",
+    "widget",
+    "blog"
+  ],
+  "author": "Haseeb Ahmed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thehaseebahmed/js-hashnode-widget/issues"
+  },
+  "homepage": "https://github.com/thehaseebahmed/js-hashnode-widget#readme",
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "tsc-watch": "^5.0.3",
+    "typescript": "^4.7.3",
+    "uglify-js": "^3.16.0",
+    "watch": "^0.13.0"
+  }
+}
