@@ -1,13 +1,14 @@
 {
   "name": "tha-hashnode-widget",
   "version": "1.0.0",
-  "description": "",
+  "description": "A very simple but responsive widget for loading blog posts from Hashnode in your personal website.",
   "scripts": {
     "build": "npm run copy && npx tsc",
     "build:prod": "npm run clean && npm run build && npm run uglify",
     "clean": "npx rimraf ./dist/*",
     "copy": "copyfiles ./src/* ./dist -f -e ./src/scripts",
     "dev": "npm run clean && watch \"npm run build\" ./src",
+    "serve": "npx ws ./dist",
     "uglify": "uglifyjs -c -m  --webkit -o ./dist/widget.min.js -- ./dist/widget.js"
   },
   "repository": {
@@ -19,7 +20,7 @@
     "widget",
     "blog"
   ],
-  "author": "Haseeb Ahmed",
+  "author": "Haseeb Ahmed <thehaseebahmed@outlook.com> (http://thehaseebahmed.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/thehaseebahmed/js-hashnode-widget/issues"
